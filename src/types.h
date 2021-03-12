@@ -13,15 +13,48 @@ typedef double r64;
 
 typedef s32 b32;
 
+#define sizeofarray(array) (sizeof(array) / sizeof((array)[0]))
+
 #ifdef SLINGAME_DEBUG
 #define assert(x) if (!(x)) *((u8 *)0) = 0;
 #else
-#define assert(x)
+#define assert(x) ;
 #endif
 
 typedef r32 MATRIX4F[16];
-typedef r32 VECTOR3F[3];
-typedef r32 VECTOR2F[2];
+
+typedef struct {
+  r32 x, y;
+} VECTOR2F;
+
+typedef struct {
+  r32 x, y, z;
+} VECTOR3F;
+
+typedef struct {
+  r32 x, y, z, w;
+} VECTOR4F;
+
+typedef struct {
+  VECTOR2F lStick;
+  VECTOR2F rStick;
+  b32 buttons;
+  u8 battery;
+  VECTOR3F gyro;
+  VECTOR3F accel;
+} CONTROLLERINPUT;
+
+typedef struct {
+  u8 rMotor, lMotor;
+  u8 r, g, b;
+} CONTROLLEROUTPUT;
+
+#define CONTROLLER_DEADZONE 0.1f
+
+#define CONTROLLER_BUTTON_A 0x1
+#define CONTROLLER_BUTTON_B 0x2
+#define CONTROLLER_BUTTON_X 0x4
+#define CONTROLLER_BUTTON_Y 0x8
 
 typedef struct {
   IDXGISwapChain *swapchain;
@@ -51,7 +84,8 @@ typedef struct {
 } MODEL;
 
 typedef struct {
-  u32 a;
+  ID3D11Buffer *indexBuffer;
+  ID3D11Buffer *vertexBuffer;
 } DXMODEL;
 
 typedef struct {
@@ -67,22 +101,48 @@ typedef struct {
 } DXSHADER;
 
 typedef struct {
-  VECTOR2F l;
-  VECTOR2F r;
-} PLAYERINPUT;
+  b32 down;
+  u32 transitions;
+} BUTTON;
+
+#define MAX_BUTTONS 1
+typedef struct {
+  VECTOR2F left;
+  VECTOR2F right;
+  union {
+    BUTTON buttons[MAX_BUTTONS];
+    struct {
+      BUTTON action0;
+    };
+  } button;
+} KEYBOARDINPUT;
 
 typedef struct {
-  VECTOR3F pos;
-  VECTOR3F rot;
+  VECTOR3F position;
+  VECTOR3F rotation;
 } PLAYER;
 
 typedef struct {
-  ID3D11Buffer *cbuffer;
+  u32 type;
+  MODEL *model;
+  VECTOR3F position;
+  VECTOR3F rotation;  
+} ENTITY;
+
+typedef struct {
+  VECTOR4F surroundlights[10];
+} DXCBUF1;
+
+typedef struct {
+  ID3D11Buffer *cbuffer[2];
   DXSHADER shader;
   ID3D11SamplerState *samplerState;
   TEXTURE texture;
   ID3D11ShaderResourceView *textureView;
-  DXCBUF0 cbuf;
-  MODEL model;
+  DXCBUF0 cbuf0;
+  DXCBUF1 cbuf1;
+  MODEL models[2];
+  DXMODEL dxmodels[2];
   PLAYER player;
+  ENTITY entities[10];
 } GAME;

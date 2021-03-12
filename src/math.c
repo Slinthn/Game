@@ -60,7 +60,7 @@ void transformMatrix4f(MATRIX4F *m, r32 tx, r32 ty, r32 tz, r32 rx, r32 ry, r32 
   (*m)[10] = cry*crx;
 }
 
-void inverseCameraMatrix4f(MATRIX4F *m, r32 tx, r32 ty, r32 tz, r32 rx, r32 ry, r32 rz) {
+void inverseTransformMatrix4f(MATRIX4F *m, r32 tx, r32 ty, r32 tz, r32 rx, r32 ry, r32 rz) {
   r32 srx = sinf(degToRad(rx));
   r32 crx = cosf(degToRad(rx));
   r32 sry = sinf(degToRad(ry));
